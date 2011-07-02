@@ -191,7 +191,7 @@ class UIInterface(QtGui.QMainWindow):
   		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 		
 		self.current_channel = 1
-		self.prev_channel = 1
+		self.prev_channel_number = 1
 		self.channel_number = 0
 		self.last_keypress_channel = None
 		self.current_crop_mode = 0
@@ -236,7 +236,7 @@ class UIInterface(QtGui.QMainWindow):
 		item = self.playlist.get(number)
 		self.player.play(item["url"])
 		self.display_text(self.playlist.get_channel_name(number))
-		self.prev_channel = self.current_channel
+		self.prev_channel_number = self.current_channel
 		self.current_channel = number
 		self.selected_subtitles = -1
 
@@ -300,7 +300,7 @@ class UIInterface(QtGui.QMainWindow):
 		self.close()
 
 	def back_to_prev_channel(self):
-		self.play(self.prev_channel)
+		self.play(self.prev_channel_number)
 
 	def change_subtitle(self, use_next=True, display_text=True):
 		t = self.player.subtitles()
