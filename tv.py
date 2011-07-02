@@ -57,7 +57,9 @@ class Player:
 		return l_res
 
 	def set_subtitle(self, i):
-		self.p.video_set_spu(i)
+		if self.p.video_get_spu_count() > 0:
+			self.p.video_set_spu(i)
+		#pass
 	
 	def crop(self, d,n):
 		if d==None or n==None:
@@ -150,7 +152,7 @@ class Playlist:
 	def get_channel_name(self, number):
 		item = self.get(number)
 		if item:
-			return str(number)+" - "+item["name"]
+			return str(number)+" - "+unicode(item["name"])
 		else:
 			return "No channel"
 
@@ -187,9 +189,9 @@ class UIInterface(QtGui.QMainWindow):
 	def __init__(self, master=None):
 		QtGui.QMainWindow.__init__(self, master)
   		self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
-
-
+		
 		self.current_channel = 1
+		self.prev_channel = 1
 		self.channel_number = 0
 		self.last_keypress_channel = None
 		self.current_crop_mode = 0
@@ -234,6 +236,7 @@ class UIInterface(QtGui.QMainWindow):
 		item = self.playlist.get(number)
 		self.player.play(item["url"])
 		self.display_text(self.playlist.get_channel_name(number))
+		self.prev_channel = self.current_channel
 		self.current_channel = number
 		self.selected_subtitles = -1
 
@@ -289,10 +292,15 @@ class UIInterface(QtGui.QMainWindow):
 		elif event.key() == QtCore.Qt.Key_I:
 			self.display_info()
 		elif event.key() == QtCore.Qt.Key_S:
-			self.change_subtitle()
+			self.change_subtitle()		
+		elif event.key() == QtCore.Qt.Key_K:
+			self.back_to_prev_channel()
 
 	def clean_and_close(self):
 		self.close()
+
+	def back_to_prev_channel(self):
+		self.play(self.prev_channel)
 
 	def change_subtitle(self, use_next=True, display_text=True):
 		t = self.player.subtitles()
@@ -352,6 +360,7 @@ class UIInterface(QtGui.QMainWindow):
 				try:
 					self.selected_subtitles = self.playlist.get_channel_setting(self.current_channel,"selected_subtitle",-1)
 					self.change_subtitle(False, False)
+					self.start_playing_channel=None
 				except:
 					pass
 
